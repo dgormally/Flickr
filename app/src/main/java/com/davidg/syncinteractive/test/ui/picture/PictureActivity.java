@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
 import com.davidg.syncinteractive.test.App;
 import com.davidg.syncinteractive.test.R;
 import com.davidg.syncinteractive.test.databinding.ActivityPictureBinding;
@@ -51,8 +52,25 @@ public class PictureActivity extends AppCompatActivity implements View.OnClickLi
 
     private void setUpViewPager() {
         CustomPagerAdapter pagerAdapter = new CustomPagerAdapter(this, App.getInstance().getArrayList());
+        viewBinding.pager.setOffscreenPageLimit(1);
         viewBinding.pager.setAdapter(pagerAdapter);
         viewBinding.pager.setCurrentItem(position);
+        preloadNeighbors(position);
+        viewBinding.pager.addOnPageChangeListener(new android.support.v4.view.ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                preloadNeighbors(position);
+            }
+        });
+    }
+
+    private void preloadNeighbors(int pos) {
+        if (pos > 0) {
+            Glide.with(this).load(App.getInstance().getArrayList().get(pos - 1).getUrl_l()).preload();
+        }
+        if (pos + 1 < App.getInstance().getArrayList().size()) {
+            Glide.with(this).load(App.getInstance().getArrayList().get(pos + 1).getUrl_l()).preload();
+        }
     }
 
     @Override

@@ -23,3 +23,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keepattributes Signature, *Annotation*
+-keep class com.davidg.syncinteractive.test.data.model.api.** { *; }
+-dontwarn okio.**
+-dontwarn javax.annotation.**
