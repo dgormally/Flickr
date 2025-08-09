@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.flickr.com</domain>
+        <domain includeSubdomains="true">farm1.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm2.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm3.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm4.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm5.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm6.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm7.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm8.staticflickr.com</domain>
+        <domain includeSubdomains="true">farm9.staticflickr.com</domain>
+        <domain includeSubdomains="true">live.staticflickr.com</domain>
+    </domain-config>
+</network-security-config>

@@ -6,7 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
-import com.davidg.syncinteractive.test.App;
+
 import com.davidg.syncinteractive.test.BR;
 import com.davidg.syncinteractive.test.R;
 import com.davidg.syncinteractive.test.data.model.api.Photo;
@@ -15,14 +15,17 @@ import com.davidg.syncinteractive.test.databinding.ActivitySearchBinding;
 import com.davidg.syncinteractive.test.ui.base.BaseActivity;
 import com.davidg.syncinteractive.test.ui.picture.PictureActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 /**
  * Created by David Gormally on 10/6/2017.
  */
 
-public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchViewModel> implements SearchNavigator, OnNextPageLoadListener, OnPictureClickListener {
-
+public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchViewModel> 
+        implements SearchNavigator, OnNextPageLoadListener, OnPictureClickListener {
 
     @Inject
     SearchViewModel searchViewModel;
@@ -31,23 +34,24 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
     private int currentPage = 1;
     private int totalPages = 0;
     private SearchAdapter adapter = null;
+    private ArrayList<Photo> photoList = new ArrayList<>();
+    private String currentQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         activitySearchBinding = getViewDataBinding();
-
         setUpRecyclerView();
-
         searchViewModel.setNavigator(this);
-
         setUpEditTextActionListener();
     }
 
     private void showDialog() {
-        adapter.setLoading(true);
-        if (App.getInstance().getArrayList().isEmpty()) {
+        if (adapter != null) {
+            adapter.setLoading(true);
+        }
+        if (photoList.isEmpty()) {
             getViewDataBinding().progressBarNoData.setVisibility(View.VISIBLE);
         } else {
             getViewDataBinding().progressBar.setVisibility(View.VISIBLE);
@@ -55,7 +59,9 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
     }
 
     private void hideDialog() {
-        adapter.setLoading(false);
+        if (adapter != null) {
+            adapter.setLoading(false);
+        }
         getViewDataBinding().progressBar.setVisibility(View.GONE);
         getViewDataBinding().progressBarNoData.setVisibility(View.GONE);
     }
@@ -72,18 +78,24 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
                         return false;
                     }
 
-                    if (getViewDataBinding().etSearch.getText().toString().trim().length() < 1) {
+                    String query = getViewDataBinding().etSearch.getText().toString().trim();
+                    if (query.length() < 1) {
                         Toast.makeText(SearchActivity.this, R.string.empty_search, Toast.LENGTH_SHORT).show();
                         getViewDataBinding().etSearch.requestFocus();
                         return false;
                     }
 
-                    App.getInstance().getArrayList().clear();
+                    // Reset search state
+                    currentQuery = query;
+                    photoList.clear();
                     currentPage = 1;
-                    getViewDataBinding().recyclerView.getAdapter().notifyDataSetChanged();
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                    
                     hideKeyboard();
                     showDialog();
-                    searchViewModel.getSearchQuery(String.valueOf(currentPage), getViewDataBinding().etSearch.getText().toString().trim());
+                    searchViewModel.getSearchQuery(String.valueOf(currentPage), query);
                     return true;
                 }
                 return false;
@@ -92,10 +104,19 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
     }
 
     private void setUpRecyclerView() {
-        activitySearchBinding.recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        adapter = new SearchAdapter(App.getInstance().getArrayList(), this);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        activitySearchBinding.recyclerView.setLayoutManager(layoutManager);
+        
+        // RecyclerView optimizations
+        activitySearchBinding.recyclerView.setHasFixedSize(true);
+        activitySearchBinding.recyclerView.setItemViewCacheSize(20);
+        activitySearchBinding.recyclerView.setDrawingCacheEnabled(true);
+        activitySearchBinding.recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        
+        adapter = new SearchAdapter(photoList, this);
         adapter.setNextPageLoadListener(this);
         adapter.setOnPictureClickListener(this);
+        adapter.setHasStableIds(true);
         activitySearchBinding.recyclerView.setAdapter(adapter);
     }
 
@@ -119,10 +140,20 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
         if (searchModel.getStat().equalsIgnoreCase("ok")) {
             currentPage = Integer.parseInt(searchModel.getPhotos().getPage());
             totalPages = Integer.parseInt(searchModel.getPhotos().getPages());
-            for (Photo photo : searchModel.getPhotos().getPhoto()) {
-                App.getInstance().getArrayList().add(photo);
+            
+            List<Photo> newPhotos = searchModel.getPhotos().getPhoto();
+            if (newPhotos != null) {
+                int startPosition = photoList.size();
+                photoList.addAll(newPhotos);
+                
+                if (adapter != null) {
+                    if (startPosition == 0) {
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        adapter.notifyItemRangeInserted(startPosition, newPhotos.size());
+                    }
+                }
             }
-            getViewDataBinding().recyclerView.getAdapter().notifyDataSetChanged();
         }
         hideDialog();
     }
@@ -136,21 +167,31 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Clear references to prevent memory leaks
+        if (adapter != null) {
+            adapter = null;
+        }
+        photoList.clear();
+        activitySearchBinding = null;
     }
 
     @Override
     public void loadNextPage() {
-        if (totalPages > currentPage) {
+        if (totalPages > currentPage && !currentQuery.isEmpty()) {
             currentPage++;
             showDialog();
-            searchViewModel.getSearchQuery(String.valueOf(currentPage), getViewDataBinding().etSearch.getText().toString().trim());
+            searchViewModel.getSearchQuery(String.valueOf(currentPage), currentQuery);
         }
     }
 
     @Override
     public void onPictureClicked(int layoutPosition) {
-        Intent intent = new Intent(this, PictureActivity.class);
-        intent.putExtra(PictureActivity.POSITION, layoutPosition);
-        startActivity(intent);
+        if (layoutPosition >= 0 && layoutPosition < photoList.size()) {
+            Intent intent = new Intent(this, PictureActivity.class);
+            intent.putExtra(PictureActivity.POSITION, layoutPosition);
+            // Pass the photo list to the next activity
+            intent.putParcelableArrayListExtra("photoList", photoList);
+            startActivity(intent);
+        }
     }
 }
