@@ -119,10 +119,13 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
         if (searchModel.getStat().equalsIgnoreCase("ok")) {
             currentPage = Integer.parseInt(searchModel.getPhotos().getPage());
             totalPages = Integer.parseInt(searchModel.getPhotos().getPages());
+            int previousSize = App.getInstance().getArrayList().size();
             for (Photo photo : searchModel.getPhotos().getPhoto()) {
                 App.getInstance().getArrayList().add(photo);
             }
-            getViewDataBinding().recyclerView.getAdapter().notifyDataSetChanged();
+            // Notify only the newly inserted range to minimize redraws
+            getViewDataBinding().recyclerView.getAdapter().notifyItemRangeInserted(previousSize,
+                    searchModel.getPhotos().getPhoto().size());
         }
         hideDialog();
     }

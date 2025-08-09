@@ -13,6 +13,9 @@ import com.davidg.syncinteractive.test.data.model.api.Photo;
 import com.davidg.syncinteractive.test.databinding.SingleRowRecyclerPictureBinding;
 import com.bumptech.glide.Glide;
 import java.util.ArrayList;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.Color;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 
 class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.MyViewHolder> {
@@ -48,7 +51,15 @@ class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
 
-        Glide.with(context).load(arrayList.get(position).getUrl_z()).into(holder.binding.ivImage);
+        // Optimized Glide call for better caching and perceived performance
+        Glide.with(context)
+                .load(arrayList.get(position).getUrl_z())
+                .thumbnail(0.1f) // Load a low-resolution thumbnail first
+                .placeholder(new ColorDrawable(Color.LTGRAY)) // Lightweight placeholder
+                .error(new ColorDrawable(Color.DKGRAY)) // Error placeholder
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // Cache both original & resized images
+                .centerCrop()
+                .into(holder.binding.ivImage);
         setAnimation(holder.binding.getRoot(), position);
 
         if (!isLoading) {
