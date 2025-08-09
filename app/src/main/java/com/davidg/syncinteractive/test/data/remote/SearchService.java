@@ -11,5 +11,5 @@ public interface SearchService {
     Call<ResponseBody> getSearchData(@Query("method") String method, @Query("format") String format,
                                      @Query("api_key") String apiKey, @Query("text") String searchQuery,
                                      @Query("per_page") String perPage, @Query("extras") String extras,
-                                     @Query("page") String currentPage);
+                                     @Query("page") String currentPage, @Query("nojsoncallback") String noJsonCallback);
 }

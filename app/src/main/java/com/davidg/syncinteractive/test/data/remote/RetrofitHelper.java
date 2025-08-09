@@ -18,9 +18,13 @@ public class RetrofitHelper {
 
     private static RetrofitHelper instance = null;
     private OkHttpClient httpClient = null;
+    private Retrofit retrofit = null;
+    private SearchService searchService = null;
 
     private RetrofitHelper(){
         httpClient = createOkHttpClient();
+        retrofit = createRetrofit();
+        searchService = retrofit.create(SearchService.class);
     }
 
     public static RetrofitHelper getInstance(){
@@ -32,15 +36,13 @@ public class RetrofitHelper {
 
 
     public SearchService getSearchService() {
-        final Retrofit retrofit = createRetrofit();
-        return retrofit.create(SearchService.class);
+        return searchService;
     }
 
     public OkHttpClient getHttpClient(){
         return httpClient;
     }
 
-    
     private OkHttpClient createOkHttpClient() {
         final OkHttpClient.Builder httpClient =
                 new OkHttpClient.Builder();

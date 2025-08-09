@@ -1,7 +1,7 @@
 package com.davidg.syncinteractive.test.ui.base;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import android.databinding.DataBindingUtil; // data binding can add method count; keep for productivity
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -43,7 +43,7 @@ public abstract class BaseActivity<T extends ViewDataBinding, V extends BaseView
 
     @Override
     protected void onDestroy() {
-        mViewModel.onDestroyView();
+        if (mViewModel != null) { mViewModel.onDestroyView(); }
         super.onDestroy();
     }
 

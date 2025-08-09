@@ -93,7 +93,9 @@ public class SearchActivity extends BaseActivity<ActivitySearchBinding, SearchVi
 
     private void setUpRecyclerView() {
         activitySearchBinding.recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        activitySearchBinding.recyclerView.setHasFixedSize(true);
         adapter = new SearchAdapter(App.getInstance().getArrayList(), this);
+        adapter.setHasStableIds(true);
         adapter.setNextPageLoadListener(this);
         adapter.setOnPictureClickListener(this);
         activitySearchBinding.recyclerView.setAdapter(adapter);

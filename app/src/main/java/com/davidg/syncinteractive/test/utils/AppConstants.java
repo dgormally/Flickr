@@ -11,6 +11,6 @@ public final class AppConstants {
     public static final String FLICKR_PHOTO_SEARCH = "flickr.photos.search";
     public static final String RESPONSE_TYPE = "json";
     public static final String PIC_PER_PAGE = "20";
-    public static final String EXTRA_QUERY = "url_z,url_l,url_o,description,owner_name";
+    public static final String EXTRA_QUERY = "url_z,description,owner_name";
 
 }
