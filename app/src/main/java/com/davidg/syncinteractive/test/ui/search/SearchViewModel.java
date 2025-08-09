@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.davidg.syncinteractive.test.data.model.api.SearchModel;
 import com.davidg.syncinteractive.test.data.remote.RetrofitHelper;
 import com.davidg.syncinteractive.test.ui.base.BaseViewModel;
-import com.davidg.syncinteractive.test.utils.rx.SchedulerProvider;
 import java.io.IOException;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -18,8 +17,8 @@ import retrofit2.Response;
 public class SearchViewModel extends BaseViewModel<SearchNavigator> {
 
 
-    SearchViewModel(SchedulerProvider schedulerProvider) {
-        super(schedulerProvider);
+    SearchViewModel() {
+        super();
     }
 
     void getSearchQuery(String page, String query) {

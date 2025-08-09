@@ -4,8 +4,11 @@ import android.support.annotation.NonNull;
 
 import com.davidg.syncinteractive.test.utils.AppConstants;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -40,10 +43,22 @@ public class RetrofitHelper {
         return httpClient;
     }
 
-    
     private OkHttpClient createOkHttpClient() {
-        final OkHttpClient.Builder httpClient =
-                new OkHttpClient.Builder();
+        final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        httpClient.connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS);
+
+        // Basic cache: 10 MB
+        try {
+            File cacheDir = new File(
+                    new File("/data/data/com.davidg.syncinteractive.test"),
+                    "http-cache");
+            Cache cache = new Cache(cacheDir, 10 * 1024 * 1024);
+            httpClient.cache(cache);
+        } catch (Exception ignored) { }
+
         httpClient.addInterceptor(new Interceptor() {
             @Override
             public Response intercept(@NonNull Chain chain) throws IOException {
@@ -54,7 +69,8 @@ public class RetrofitHelper {
                         .build();
 
                 final Request.Builder requestBuilder = original.newBuilder()
-                        .url(url);
+                        .url(url)
+                        .header("Cache-Control", "public, max-age=60");
 
                 final Request request = requestBuilder.build();
                 return chain.proceed(request);

@@ -1,7 +1,5 @@
 package com.davidg.syncinteractive.test.ui.search;
 
-import com.davidg.syncinteractive.test.utils.rx.SchedulerProvider;
-
 import dagger.Module;
 import dagger.Provides;
 
@@ -10,8 +8,8 @@ import dagger.Provides;
 public class SearchActivityModule {
 
     @Provides
-    SearchViewModel provideSearchViewModel(SchedulerProvider schedulerProvider) {
-        return new SearchViewModel(schedulerProvider);
+    SearchViewModel provideSearchViewModel() {
+        return new SearchViewModel();
     }
 
 }

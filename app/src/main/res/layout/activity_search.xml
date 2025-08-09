@@ -3,7 +3,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="#868686">
 
         <LinearLayout
@@ -33,13 +33,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_scrollFlags="scroll|enterAlways">
-
-                    <com.davidg.syncinteractive.test.utils.ResizableImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/actionbar_bg"
-                        android:visibility="invisible" />
 
                     <android.support.v7.widget.CardView
                         android:layout_width="match_parent"
@@ -78,7 +71,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_15sdp"

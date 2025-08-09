@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 
 import com.davidg.syncinteractive.test.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.davidg.syncinteractive.test.data.model.api.Photo;
 
 import java.util.ArrayList;
@@ -49,7 +50,11 @@ class CustomPagerAdapter extends PagerAdapter {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.single_pager_layout, container, false);
         ImageView imageView = (ImageView) itemView.findViewById(R.id.pager_imageView);
 
-        Glide.with(mContext).load(arrayList.get(position).getUrl_l()).into(imageView);
+        Glide.with(mContext)
+                .load(arrayList.get(position).getUrl_l())
+                .thumbnail(0.25f)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(imageView);
 
         container.addView(itemView);
         return itemView;
