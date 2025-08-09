@@ -49,7 +49,15 @@ class CustomPagerAdapter extends PagerAdapter {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.single_pager_layout, container, false);
         ImageView imageView = (ImageView) itemView.findViewById(R.id.pager_imageView);
 
-        Glide.with(mContext).load(arrayList.get(position).getUrl_l()).into(imageView);
+        String preferred = arrayList.get(position).getUrl_z();
+        String fallback = arrayList.get(position).getUrl_l();
+        String url = preferred != null && preferred.length() > 0 ? preferred : fallback;
+
+        Glide.with(mContext)
+                .load(url)
+                .thumbnail(0.25f)
+                .dontAnimate()
+                .into(imageView);
 
         container.addView(itemView);
         return itemView;

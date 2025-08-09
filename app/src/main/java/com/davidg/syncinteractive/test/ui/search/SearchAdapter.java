@@ -48,7 +48,11 @@ class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.MyViewHolder> {
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
 
-        Glide.with(context).load(arrayList.get(position).getUrl_z()).into(holder.binding.ivImage);
+        Glide.with(context)
+                .load(arrayList.get(position).getUrl_z())
+                .thumbnail(0.25f)
+                .dontAnimate()
+                .into(holder.binding.ivImage);
         setAnimation(holder.binding.getRoot(), position);
 
         if (!isLoading) {
